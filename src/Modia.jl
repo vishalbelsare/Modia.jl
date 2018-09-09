@@ -7,7 +7,6 @@ Modia main module.
 =#
 
 
-#import ModiaMath
 
 """
 Modia - Dynamic Modeling and Simulation in Julia
@@ -29,7 +28,6 @@ To simulate a model:
 ```julia
   result = simulate(FirstOrder, 2);
   @show result["x"][end];
-  ModiaMath.plot(result, "x")
 ```
 
 To run examples:

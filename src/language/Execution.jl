@@ -26,7 +26,6 @@ end
 import ..Instantiation: Symbolic, Der, Instance, AbstractDict, VariableDict, Variable, Nothing, time_symbol, simulationModel_symbol, vars_of, check_start, GetField, This, time_global, simulationModel_global, eqs_of, get_start, get_dims, model_name_of, operator_table, prettyPrint
 import ..Instantiation: Variability, constant, parameter, discrete, continuous
 
-import ModiaMath #0.7
 using Unitful
 using ..ModiaLogging
 
@@ -244,7 +243,6 @@ function prepare_ida(instance::Instance, first_F_args, initial_bindings::Abstrac
     s[simulationModel_global] = simulationModel_symbol
 
     computations = []
-    # push!(computations, :(if ModiaMath.ModiaToModiaMath.isPreInitial($simulationModel_symbol)
     # $simulationModel_symbol.store = Synchronous.Store()
     # end))
     if logComputations
@@ -474,10 +472,6 @@ function prepare_ida(instance::Instance, first_F_args, initial_bindings::Abstrac
               for (k, name) in enumerate(eliminated)
           ]
         store_elim = quote
-            if ($(quot(is_output_point))($simulationModel_symbol))
-                $eliminated_results = $(quot(get_eliminated_results_object))($simulationModel_symbol)
-                $(store_elims...)
-            end
         end
     end
 
@@ -539,10 +533,7 @@ end
 global_elim_results = Vector{Vector}()
 
 # Temporary definitions
-import ModiaMath.ModiaToModiaMath.ModiaSimulationModel
-#is_output_point(m::ModiaSimulationModel) = true # Should not always be true!
-is_output_point(m::ModiaSimulationModel) = false # Should not always be true!
-get_eliminated_results_object(m::ModiaSimulationModel) = global_elim_results
+
 
 function extract_results_ida(x_res, der_x_res, states, state_offsets, params)
     results = Dict{AbstractString,Any}()
@@ -571,26 +562,16 @@ function simulate_ida(instance::Instance, t::Vector{Float64},
                       log=false, relTol=1e-4, maxSparsity=0.1,
                       store_eliminated=storeEliminated)
 
-    if PrintJSONsolved
-        printJSONforSolvedEquations(instance)
-    end
+    println("... simulate_ida start")
 
     initial_bindings = Dict{Symbol,Any}(time_symbol => t[1])
-    initial_m = ModiaSimulationModel()
-
-    initial_bindings[simulationModel_symbol] = initial_m
 
     prep = prepare_ida(instance, [simulationModel_symbol], initial_bindings, store_eliminated=storeEliminated, need_eliminated_f=storeEliminated)
     F, eliminated_f, x0, der_x0, diffstates, params, states, state_sizes, state_offsets, eliminated = prep
-  
-    println("+++ simulate_ida before ModiaSimulationModel")
-    str = string(model_name_of(instance))
-    println("... model_name = ", str)
+
     println("... typeof(F) = ", typeof(F))
     println("... F = ", F)
 
-    #    m = ModiaSimulationModel(string(model_name_of(instance)), F, x0;
-    #                    maxSparsity=maxSparsity, nc=1, nz=initial_m.nz_preInitial, jac=jac, x_fixed=diffstates)
 
     t_res = t
     x_res = t
@@ -601,6 +582,7 @@ function simulate_ida(instance::Instance, t::Vector{Float64},
 
     results
 end
+
 
 # -----------------------------
 
