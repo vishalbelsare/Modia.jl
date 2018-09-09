@@ -588,6 +588,7 @@ function simulate_ida(instance::Instance, t::Vector{Float64},
     global global_elim_results = eliminated_results
 
     if callF || handleImpulses || showJacobian
+        println("... callResidualFunction ")
         callResidualFunction(F, callF, handleImpulses, showJacobian, x0, der_x0, diffstates, instance)
     end
     
@@ -617,10 +618,19 @@ function simulate_ida(instance::Instance, t::Vector{Float64},
 
     start = now()
     
-    if length(x0) > 0    
-        m = ModiaSimulationModel(string(model_name_of(instance)), F, x0;
-                        maxSparsity=maxSparsity, nc=1, nz=initial_m.nz_preInitial, jac=jac, x_fixed=diffstates)
-    end
+    println("+++ simulate_ida before ModiaSimulationModel")
+    str = string(model_name_of(instance))
+    println("... model_name = ", str)
+    println("... F = ", F)
+    #println("... typeof(F) = ", typeof(F))
+    println("... x0 = ", x0)
+    println("... maxSparsity = ", maxSparsity)
+    println("... nz = ", initial_m.nz_preInitial)
+    println("... jac = ", typeof(jac) == Nothing ? "nothing" : jac)
+    println("... diffstates = ", diffstates)
+
+    #    m = ModiaSimulationModel(string(model_name_of(instance)), F, x0;
+    #                    maxSparsity=maxSparsity, nc=1, nz=initial_m.nz_preInitial, jac=jac, x_fixed=diffstates)
 
     t_res = t
     x_res = t
