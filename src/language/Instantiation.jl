@@ -33,7 +33,6 @@ else
   using LinearAlgebra
 end
 
-import ModiaMath #0.7
 using Unitful
 using ..ModiaLogging
 #using ..Synchronous
