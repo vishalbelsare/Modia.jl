@@ -503,6 +503,10 @@ function prepare_ida(instance::Instance, first_F_args, initial_bindings::Abstrac
 
     # F = Eval(F_code)
     F = evaluate(Module(), F_code)
+
+    #println("... typeof(F) = ", typeof(F))
+    #println("... F = ", F)
+
     #=
       if modeConditions != []
         F_Dict[modeConditions] = (F, initial_eliminated)
