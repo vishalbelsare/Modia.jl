@@ -618,49 +618,17 @@ function simulate_ida(instance::Instance, t::Vector{Float64},
     start = now()
     
     if length(x0) > 0    
-        if false
-            m = ModiaSimulationModel(model_name_of(instance), F, x0, der_x0, jac;
-                        xw_states=diffstates, maxSparsity=maxSparsity, nc=1, nz=initial_m.nz_preInitial,
-                        xNames=xNames)
-        else
-            m = ModiaSimulationModel(string(model_name_of(instance)), F, x0;
+        m = ModiaSimulationModel(string(model_name_of(instance)), F, x0;
                         maxSparsity=maxSparsity, nc=1, nz=initial_m.nz_preInitial, jac=jac, x_fixed=diffstates)
-        end 
-
-        if logTiming
-            print("\n  ModiaMath:           ")
-            @time ModiaMath.ModiaToModiaMath.simulate(m, t; log=log, tolRel=relTol)
-            # @show now()-start
-            if logTiming
-                print("  ModiaMath:           ")
-                @time ModiaMath.ModiaToModiaMath.simulate(m, t; log=log, tolRel=relTol)
-                # @show now()-start
-            end
-        else
-            ModiaMath.ModiaToModiaMath.simulate(m, t; log=log, tolRel=relTol)
-        end
-
-        (t_res, x_res, der_x_res) = ModiaMath.ModiaToModiaMath.getRawResult(m)
-        # @show now()-start
-    else
-        t_res = t
-        x_res = t
-        der_x_res = t
     end
 
-    results = extract_results_ida(x_res, der_x_res, states, state_offsets, params)
-    # @show keys(results)
-    # @show now()-start
-    if store_eliminated
-        Base.invokelatest(eliminated_f, results, t_res, x_res, der_x_res)
-        # @show now()-start
-    else
-        for (name, result) in zip(keys(eliminated), eliminated_results)
-            results[string(name)] = result
-        end
-        # @show now()-start
-    end
-    results["time"] = t_res
+    t_res = t
+    x_res = t
+    der_x_res = t
+
+    results = Dict{Symbol,AbstractVector}()
+    results[:time] = t
+
     results
 end
 
