@@ -582,52 +582,12 @@ function simulate_ida(instance::Instance, t::Vector{Float64},
 
     prep = prepare_ida(instance, [simulationModel_symbol], initial_bindings, store_eliminated=storeEliminated, need_eliminated_f=storeEliminated)
     F, eliminated_f, x0, der_x0, diffstates, params, states, state_sizes, state_offsets, eliminated = prep
-
-    eliminated_results = Vector[Vector{T}() for T in values(eliminated)]
-    # temporary until we can store it in simulationModel
-    global global_elim_results = eliminated_results
-
-    if callF || handleImpulses || showJacobian
-        println("... callResidualFunction ")
-        callResidualFunction(F, callF, handleImpulses, showJacobian, x0, der_x0, diffstates, instance)
-    end
-    
-    xNames = fill("[]", length(x0))    
-    ii = 0
-
-    for (name, var) in states
-        ii += 1
-        name = string(name)
-        xNames[state_offsets[ii]] = name
-
-        if state_sizes[ii] > 1
-            dims = get_dims(var)
-            dimsArray = collect(dims)
-
-            if length(dimsArray) == 1
-                for j in 1:dimsArray[1]
-                    xNames[state_offsets[ii] + j - 1] = name * "[" * string(j) * "]"          
-                end
-            else
-                xNames[state_offsets[ii]] = name * "[]"
-                xNames[state_offsets[ii] + state_sizes[ii] - 1] = string(collect(dimsArray))
-            end
-        end
-    end
-    # @show xNames
-
-    start = now()
-    
+  
     println("+++ simulate_ida before ModiaSimulationModel")
     str = string(model_name_of(instance))
     println("... model_name = ", str)
+    println("... typeof(F) = ", typeof(F))
     println("... F = ", F)
-    #println("... typeof(F) = ", typeof(F))
-    println("... x0 = ", x0)
-    println("... maxSparsity = ", maxSparsity)
-    println("... nz = ", initial_m.nz_preInitial)
-    println("... jac = ", typeof(jac) == Nothing ? "nothing" : jac)
-    println("... diffstates = ", diffstates)
 
     #    m = ModiaSimulationModel(string(model_name_of(instance)), F, x0;
     #                    maxSparsity=maxSparsity, nc=1, nz=initial_m.nz_preInitial, jac=jac, x_fixed=diffstates)
