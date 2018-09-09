@@ -45,8 +45,8 @@ export elaborate, prettyPrint, simulateModel, simulate, skewCoords, skew, residu
 export checkSimulation
 
 const useIncidenceMatrix = BasicStructuralTransform.useIncidenceMatrix
-const elaborate = true
-#@show elaborate
+const elaborate = false
+@show elaborate
 const tearing = false
 #@show tearing
 
