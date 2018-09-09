@@ -33,7 +33,7 @@ end
 using ..Synchronous
 using ..BLTandPantelidesUtilities
 #using ..Utilities
-import ModiaMath
+
 using ..ModiaLogging
 
 export initSynchronousCounters, substituteClocked, solve, solveEquations, solveSortedEquations, differentiate, differentiateEquations, differentiateSortedEquations, residue_der, newDifferentiateEquations
@@ -83,9 +83,6 @@ function substituteClocked(previousVariables, ex::Expr)
         global nprevious += 1
         push!(previousVariables, ex.args[2])
         Expr(ex.head, ex.args[1], ex.args[2], substituteClocked(previousVariables, ex.args[3]), simulationModel_symbol, nprevious)
-    elseif isexpr(ex, :call) && ex.args[1] == Synchronous.positive
-        global npositive += 1
-        Expr(ex.head, ModiaMath.ModiaToModiaMath.positive!, ex.args[2], simulationModel_symbol, npositive)
     else    
         Expr(ex.head, [substituteClocked(previousVariables, arg) for arg in ex.args]...)
     end
