@@ -33,7 +33,6 @@ using ..StructuralTransform
 using ..SymbolicTransform
 using ..Utilities
 using ..ModiaLogging
-using PyPlot
 using JSON
 
 @static if VERSION < v"0.7.0-DEV.2005"

@@ -38,7 +38,6 @@ using ..StateSelection
 
 using ..ModiaLogging
 
-using PyPlot
 
 export residue, hide, skew, skewCoords, residue_der
 export analyzeStructurally, basicTransformStructurally, setOptions
