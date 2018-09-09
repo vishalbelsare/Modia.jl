@@ -14,7 +14,7 @@ using ..BLTandPantelidesUtilities
 using ..Utilities
 import ..Instantiation: GetField, This, Der, Symbolic, prettyPrint, prettyfy
 import ..Execution: logTiming
-import ..Execution: ModiaSimulationModel, extract_results_ida
+import ..Execution: extract_results_ida
 import ..Execution: Subs, subs
 using DataStructures: OrderedDict
 
@@ -35,11 +35,10 @@ using ..SymbolicTransform
 
 using ..ExactlyRemoveSingularities
 using ..StateSelection
-import ModiaMath
+
 using ..ModiaLogging
 
 using PyPlot
-#using ModiaMath.plot
 
 export residue, hide, skew, skewCoords, residue_der
 export analyzeStructurally, basicTransformStructurally, setOptions
@@ -1309,15 +1308,12 @@ function generateCode(newStateSelection, useKinsol, params, realStates, unknowns
     func = "\nmodule ModuleFDAE\n"
     func *= "import Modia\n"
     # func *= "import MultiBody\n"
-    func *= "import ModiaMath\n"
     func *= "\nfunction FDAE(_mod, t0, _x, _der_x, _res, _w)\n"
 
     func *= "\n"
     func *= "  # Function to solve systems of equations\n"
 
     func *= "  function solve(y, f!)
-    info = ModiaMath.NonlinearEquationsInfo(\"\", length(y), f!)
-    ModiaMath.solveNonlinearEquations!(info, y)
     return y
   end" * "\n\n"      
 
@@ -1666,51 +1662,7 @@ function generateCode(newStateSelection, useKinsol, params, realStates, unknowns
         @show r
         nc = sortedEquations.nc
     end
-    
-    # Temporary code for testing:
-    #    m = ModiaSimulationModel(model_name_of(instance), FDAE, x0, der_x0, jac;
-    #                             maxSparsity=maxSparsity, nz=initial_m.nz_preInitial,
-    #                             xNames=xNames, nc=sortedEquations.nc)
-    #    m = ModiaSimulationModel(string(model_name_of(instance)), F, x0;
-    #                             maxSparsity=maxSparsity, nc=1, nz=initial_m.nz_preInitial, jac=jac, x_fixed=diffstates)
 
-    m = ModiaSimulationModel("test", ModuleFDAE.FDAE, x0) #, der_x0, nothing)
-    #                        nc=nc)
-    #=  
-    println("Call FDAE once")
-    w = []
-    Base.invokelatest(ModuleFDAE.FDAE, m, 0, x0, der_x0, r, w)
-    println("FDAE called")
-    @show r
-    @show x0
-    =#    
-    
-    if length(x0) > 0
-        println("\nSimulate")
-        t = linspace(0.0, 50, 1000)
-        result = ModiaMath.ModiaToModiaMath.simulate(m, t; log=false, tolRel=1E-5)
-      
-        # Plot results
-        t = result["time"]
-        # figure()
-        clf()
-        # title(string(m))
-        vars = keys(result)
-        leg = String[]
-        for v in vars
-            if v != "time" && !(findfirst(isequal(v), "der") != notFound)
-                plot(result["time"], result[v])
-                push!(leg, v)
-            end
-        end
-        legend(leg,  loc="center right")
-        grid(true)
-        xlabel("time [s]")
-        # @show result vars leg
-        # plot(result, Tuple(leg))
-        #    (t_res,x_res,der_x_res) = ModiaMath.ModiaToModiaMath.getRawResult(m)
-    end
-    # results = extract_results_ida(x_res, der_x_res, states, state_offsets, params)
     nothing
 end
 
