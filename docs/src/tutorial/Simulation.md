@@ -24,7 +24,7 @@ modelInstance = @instantiateModel(model; FloatType = Float64, aliasReduction=tru
 
 The macro performs structural and symbolic transformations, generates a function for
 calculation of derivatives suitable for use with [DifferentialEquations.jl](https://github.com/SciML/DifferentialEquations.jl)
-and returns [`SimulationModel`](@ref) that can be used in other functions,
+and returns [`InstantiatedModel`](@ref) that can be used in other functions,
 for example to simulate or plot results. Explanation of the arguments:
 
 * `model`: model (declarations and equations)
@@ -331,7 +331,7 @@ code = quote
             var"der(w1)" = var"der(der(phi1))"
             tau1 = -((_FloatType(_p[:J1])::_FloatType * var"der(w1)" - tau))
             tau2 = _FloatType(_p[:ratio])::_FloatType * tau1
-            ModiaBase.appendVariable!(_leq_mode.residuals, ModiaLang.Unitful.ustrip.(tau2) .- ModiaLang.Unitful.ustrip.(_FloatType(_p[:J2])::_FloatType * var"der(w2)"))
+            ModiaBase.appendVariable!(_leq_mode.residuals, Modia.Unitful.ustrip.(tau2) .- Modia.Unitful.ustrip.(_FloatType(_p[:J2])::_FloatType * var"der(w2)"))
         end
     _leq_mode = nothing
 end

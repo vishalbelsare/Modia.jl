@@ -1,12 +1,16 @@
 module Runtests
 
-using Modia
-using Test 
+# Run all tests with SilentNoPlot (so not plots)
 
-@time begin
+using Modia
+using Modia.Test 
+
+const  test_title = "Test Modia (version=$(Modia.Version) with SilentNoPlot)"
+println("\n... $test_title")
+
+@time @testset verbose=true "$test_title" begin
     usePlotPackage("SilentNoPlot")
-    include("$(Modia.ModiaLang.path)/test/runtests.jl")
-    include("../examples/runexamples.jl")
+    include("include_all.jl")  
     usePreviousPlotPackage()
 end
 
